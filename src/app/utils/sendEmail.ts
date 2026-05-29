@@ -1,14 +1,14 @@
-/*import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import config from "../config";
 
 dotenv.config();
 
-export const sendEmail = async (to: string, subject:string, html: string) => {
+export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
-     auth: {
+      auth: {
         user: config.smtp_email,
         pass: config.smtp_pass,
       },
@@ -25,4 +25,4 @@ export const sendEmail = async (to: string, subject:string, html: string) => {
     console.error("Failed to send email:", error);
     throw new Error("Failed to send email");
   }
-};*/
+};

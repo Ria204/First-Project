@@ -1,0 +1,33 @@
+export type TLoginAuth = {
+  email: string;
+  password: string;
+};
+
+import { Model } from "mongoose";
+import { UserRole } from "./auth.constants";
+
+export type TUser= {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth : Date;
+  city : string;
+  pinCode : string;
+  addressLine1 : string;
+  addressLine2 : string;
+  password: string;
+  role: TUserRole;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserModel extends Model<TUser> {
+  isUserExists(email: string): Promise<TUser>;
+  isPasswordMatched(
+    plainTextPassword: string,
+    hashedPassword: string
+  ): Promise<boolean>;
+}
+
+export type TUserRole = keyof typeof UserRole;

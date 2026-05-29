@@ -1,0 +1,87 @@
+import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
+import { TUser, UserModel } from "./auth.interface";
+import config from "../../app/config";
+
+const userSchema = new Schema<TUser, UserModel>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    dateOfBirth: {
+      type: Date,
+    },
+    city: {
+      type: String,
+    },
+    pinCode: {
+      type: String,
+    },
+    addressLine1: {
+      type: String,
+    },
+    addressLine2: {
+      type: String,
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(
+      this.password,
+      Number(config.bcrypt_salt_round)
+    );
+  }
+  next();
+});
+
+// Hide password after saving
+userSchema.post("save", function (doc) {
+  doc.password = "";
+});
+
+// Static methods
+userSchema.statics.isUserExists = async function (email: string) {
+  return await this.findOne({ email }).select("+password");
+};
+
+userSchema.statics.isPasswordMatched = async function (
+  plainTextPassword: string,
+  hashedPassword: string
+) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+// Export the model
+export const User = model<TUser, UserModel>("User", userSchema);
